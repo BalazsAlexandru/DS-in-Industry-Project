@@ -29,7 +29,7 @@ Catalin
 - Create sentiment prediction model for Ukraine and Russia
 
 Danilo
-- Make it into a Service
+- Make it into a WebApplication
 
 ## Features
 
