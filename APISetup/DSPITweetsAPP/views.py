@@ -246,3 +246,11 @@ def naive_bayes_predict(tweet, logprior, loglikelihood):
             p += loglikelihood[word]
 
     return p
+
+from rest_framework import generics
+from .models import Tweet
+from .serializers import TweetSerializer
+
+class TweetList(generics.ListAPIView):
+    queryset = Tweet.objects.all()
+    serializer_class = TweetSerializer
