@@ -12,6 +12,26 @@ This project is made up of two main stages:
 
  - the data pipeline that uses the Twitter API to extract, transform and load the data
  - the App that will generate real-time sentiment scores for the selected criteria
+ 
+## Work distribution
+
+Darius
+- Finish sentiment analysis
+- Clean ipynb file
+
+Danko
+- Stream current (daily) data from Twitter API to the app in the correct format
+
+Balazs
+- Put it all on github
+
+Catalin
+- Create sentiment prediction model for Ukraine and Russia
+
+Danilo
+- Make it into an API
+
+## 
 
 # Team Members
 
