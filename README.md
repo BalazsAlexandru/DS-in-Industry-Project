@@ -31,7 +31,12 @@ Catalin
 Danilo
 - Make it into an API
 
-## 
+## Features
+
+1. Daily tweets related to Ukraine-Russia War
+2. Summarise today's tweets
+3. Daily sentiment for Ukraine and for Russia
+4. Predict the sentiment for the next (7?) days
 
 # Team Members
 
