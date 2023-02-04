@@ -1,0 +1,42 @@
+<head>
+    <title>Tweets sumamrised per day</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container-auto m-5">
+<div class="mainForm p-5">
+    <div class="alert alert-danger" role="alert" style="max-width:40rem;">
+        This page may load slow because of the amount of data it needs to compute!
+</div>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="btn btn-success" type="submit" value="Search">
+</form>
+
+    <a  class="btn btn-warning" href="/DSPITweets/">Back to main page</a>
+</div>
+
+{% if text %}
+    <style>
+        .mainForm{
+            display: none;
+        }
+    </style>
+    {% with tweet=tweets.0 %}
+    <section class="p-3">
+            <h3 >Tweets summarised for the day of: {{ tweet.tweet_date }} </h3>
+            <a class="btn btn-info" style="color:White;" href="/DSPITweets/tweet_search_sumarised">Back to the search page!</a>
+        </section>
+    {% endwith %}
+    <div class="row">
+        <p>{{ text }}</p>
+    </div>
+
+{% else %}
+        <h1>No text was found!</h1>
+{% endif %}
+</div>
+</body>
+
