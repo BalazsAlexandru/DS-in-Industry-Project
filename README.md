@@ -45,3 +45,19 @@ Danilo Vuita
 Danko Mikic
 Darius Cocirta
 Catalin Iusan
+
+
+# Project setup:
+
+## Create the predict model:
+- Install the following models using the commands: ’ !pip install prophet’ and
+’ !pip install mxnet gluonts ujson’
+- Run the ’prediction.ipynb’ as as a Google Collab file
+## Web scrape python analysis:
+- Import the related libraries
+- Run the ’main.ipynb’ on any IDE that supports python (Visual Studio Code,
+Pycharm, etc.)
+## Web application:
+- Import the ’APISetup’ folder as a Django project and run it accordingly
+
+
