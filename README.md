@@ -55,7 +55,7 @@ Catalin Iusan
 - Run the ’prediction.ipynb’ as as a Google Collab file
 ## Web scrape python analysis:
 - Import the related libraries
-- Run the ’main.ipynb’ on any IDE that supports python (Visual Studio Code,
+- Run the ’Big_Chungus.ipynb’ on any IDE that supports python (Visual Studio Code,
 Pycharm, etc.)
 ## Web application:
 - Import the ’APISetup’ folder as a Django project and run it accordingly
