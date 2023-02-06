@@ -1,0 +1,33 @@
+<head>
+    <title>All Russian Tweets</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="container-auto p-5">
+{% if tweets %}
+    <section class="p-2">
+    <h1>All Russian Tweets
+        <a  class="btn btn-warning" href="http://127.0.0.1:8000/DSPITweets">Back to index page</a>
+    </h1>
+    </section>
+
+    <div class="row">
+    {% for tweet in tweets %}
+        <div class="col p-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ tweet.ru_tweet_user_name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ tweet.ru_tweet_date }}</h6>
+                    <p class="card-text" id="cardText">{{ tweet.ru_tweet_text }}</p>
+                    <a href="{{ tweet.ru_tweet_urls }}" class="btn btn-primary">Go to tweet!</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <h1>No tweets</h1>
+{% endif %}
+</div>
+</body>
