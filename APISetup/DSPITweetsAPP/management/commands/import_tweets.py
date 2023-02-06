@@ -1,6 +1,6 @@
 import csv
 from django.core.management.base import BaseCommand
-from ...models import Tweet
+from ...models import WestTweet
 from datetime import datetime
 
 
@@ -18,9 +18,9 @@ class Command(BaseCommand):
             next(reader)
 
             for row in reader:
-                id, created_at, date, time, username, name, tweet, language, mentions, photos, replies_count, retweets_count, likes_count, hashtags, link, retweet, video, reply_to, views_count,sentiment = row
-                Tweet.objects.create(
-                    tweet_id=id,
+                id,tweet_id, created_at, date, time, username, name, tweet, language, mentions, photos, replies_count, retweets_count, likes_count, hashtags, link, retweet, video, reply_to, views_count,sentiment = row
+                WestTweet.objects.create(
+                    tweet_id=tweet_id,
                     tweet_created_at=created_at,
                     tweet_date=datetime.strptime(date, '%m/%d/%Y').date(),
                     tweet_time=time,

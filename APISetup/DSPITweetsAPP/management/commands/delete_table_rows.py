@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
 
-from ...models import Tweet
+from ...models import WestTweet
 
 
 class Command(BaseCommand):
-    help = 'Delete all rows from the TweetWithSentimentAnalysis table'
+    help = 'Delete all rows from the WestTweets table'
 
     def handle(self, *args, **options):
-        Tweet.objects.all().delete()
+        WestTweet.objects.all().delete()
