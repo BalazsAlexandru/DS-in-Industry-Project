@@ -1,0 +1,73 @@
+<head>
+    <title>All tweets per day</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+
+<style>
+    #cardText{
+         overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 20;
+        -webkit-box-orient: vertical;
+    }
+</style>
+
+<div class="container-auto m-5">
+<div class="mainForm p-5">
+    <form method="post" >
+        <h2>Search for tweets from a given day</h2>
+
+        <div class="alert alert-info" role="alert" style="max-width:40rem;">
+            Format of the date for searching is Month/Day/Year
+        </div>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="btn btn-success" type="submit" value="Search">
+</form>
+    <a  class="btn btn-warning" href="/russian_tweets/">Back to main page</a>
+</div>
+
+
+
+{% if tweets %}
+    <style>
+    .mainForm{
+        display: none;
+    }
+    </style>
+    {% with tweet=tweets.0 %}
+        <section class="p-3">
+            <h3 >Tweets for the day of: {{ tweet.ru_tweet_date }} </h3>
+            <a class="btn btn-info" style="color:White;" href="/DSPITweets/russian_tweets/">Back to the search page!</a>
+        </section>
+
+    {% endwith %}
+    <div class="row">
+    {% for tweet in tweets %}
+        <div class="col p-2">
+            <div class="card mb-3 p-2" >
+                <div class="card-body">
+                    <h5 class="card-title">{{ tweet.ru_tweet_user_name }}</h5>
+                    <h6 class="card-subtitle mb-2"> {{ tweet.ru_tweet_date }}</h6>
+                    <p class="card-subtitle mb-2 text-muted">
+                        Views Count:  {{ tweet.ru_tweet_views_count }}<br>
+                        Likes Count:  {{ tweet.ru_tweet_likes_count }}<br>
+                        Replies Count:  {{ tweet.ru_tweet_replies_count }}<br>
+                        Retweets Count:  {{ tweet.ru_tweet_retweets_count }}
+                    </p>
+                    <p class="card-text" id="cardText">{{ tweet.ru_tweet_text }}</p>
+                    <a href="{{ tweet.ru_tweet_urls }}" class="btn btn-primary">Go to tweet!</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+{% else %}
+        <h1>No tweets found yet!</h1>
+{% endif %}
+</div>
+</body>

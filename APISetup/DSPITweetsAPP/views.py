@@ -9,14 +9,27 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
 # Create your views here.
-from .models import Tweet
+
+from .models import WestTweet, RussianTweet
 
 
 def index(request):
-    all_tweets = Tweet.objects.all()
+    return render(request, 'index.html', {})
+
+
+def westIndex(request):
+    all_tweets = WestTweet.objects.all()
     return render(request, 'tweets.html', {'tweets': all_tweets})
+
+
+def russianIndex(request):
+    all_tweets = RussianTweet.objects.all()
+    return render(request, 'russian_tweets.html', {'tweets': all_tweets})
+
+
+def sentimentPrediction(request):
+    return render(request, 'sentimentPrediction.html', {})
 
 
 class TweetSearchForm(forms.Form):
@@ -28,8 +41,20 @@ def tweet_search(request):
         form = TweetSearchForm(request.POST)
         if form.is_valid():
             search_date = form.cleaned_data['search_date']
-            tweets = Tweet.objects.filter(tweet_date=search_date)
+            tweets = WestTweet.objects.filter(tweet_date=search_date)
             return render(request, 'tweet_search.html', {'tweets': tweets})
+    else:
+        form = TweetSearchForm()
+    return render(request, 'tweet_search.html', {'form': form})
+
+
+def ru_tweet_search(request):
+    if request.method == 'POST':
+        form = TweetSearchForm(request.POST)
+        if form.is_valid():
+            search_date = form.cleaned_data['search_date']
+            tweets = RussianTweet.objects.filter(ru_tweet_date=search_date)
+            return render(request, 'russian_tweets_search.html', {'tweets': tweets})
     else:
         form = TweetSearchForm()
     return render(request, 'tweet_search.html', {'form': form})
@@ -40,12 +65,25 @@ def tweet_search_sumarised(request):
         form = TweetSearchForm(request.POST)
         if form.is_valid():
             search_date = form.cleaned_data['search_date']
-            tweets = Tweet.objects.filter(tweet_date=search_date)
+            tweets = WestTweet.objects.filter(tweet_date=search_date)
             text = text_summarisation(tweets)
             return render(request, 'tweet_summarize.html', {'text': text, 'tweets': tweets})
     else:
         form = TweetSearchForm()
     return render(request, 'tweet_summarize.html', {'form': form})
+
+
+def ru_tweet_search_sumarised(request):
+    if request.method == 'POST':
+        form = TweetSearchForm(request.POST)
+        if form.is_valid():
+            search_date = form.cleaned_data['search_date']
+            tweets = RussianTweet.objects.filter(ru_tweet_date=search_date)
+            text = text_summarisation(tweets)
+            return render(request, 'russian_tweets_summarised.html', {'text': text, 'tweets': tweets})
+    else:
+        form = TweetSearchForm()
+    return render(request, 'russian_tweets_summarised.html', {'form': form})
 
 
 def text_summarisation(tweets):
@@ -93,7 +131,7 @@ def text_summarisation(tweets):
 
 def tweet_sentiment(request):
     corpus_tweet = []
-    all_tweets = Tweet.objects.all()
+    all_tweets = WestTweet.objects.all()
     for tweet in all_tweets:
         corpus_tweet.append(tweet.tweet_text)
     korpus = []
@@ -135,16 +173,65 @@ def tweet_sentiment(request):
     data['sentiment'] = p_list
     fig = plt.figure(figsize=(14, 6))
     sns.histplot(data['sentiment'], kde=True, color='cadetblue')
-    plt.savefig("./static/sentimentPlot.png")
+    plt.savefig("./static/westSentimentPlot.png")
 
-    return render(request, 'tweet_sentiment.html' ,{})
+    return render(request, 'tweet_sentiment.html', {})
+
+
+def ru_tweet_sentiment(request):
+    corpus_tweet = []
+    all_tweets = RussianTweet.objects.all()
+    for tweet in all_tweets:
+        corpus_tweet.append(tweet.ru_tweet_text)
+    korpus = []
+    for tweet in corpus_tweet:
+        korpus.append(tweet_process(tweet))
+    nltk.download('twitter_samples')
+    all_positive_tweets = twitter_samples.strings('positive_tweets.json')
+    all_negative_tweets = twitter_samples.strings('negative_tweets.json')
+    test_pos = all_positive_tweets[4000:]
+    train_pos = all_positive_tweets[:4000]
+    test_neg = all_negative_tweets[4000:]
+    train_neg = all_negative_tweets[:4000]
+
+    train_x = train_pos + train_neg
+    test_x = test_pos + test_neg
+
+    train_y = np.append(np.ones(len(train_pos)), np.zeros(len(train_neg)))
+    test_y = np.append(np.ones(len(test_pos)), np.zeros(len(test_neg)))
+
+    freqs = create_frequency(train_x, train_y)
+
+    logprior, loglikelihood = train_naive_bayes(freqs, train_x, train_y)
+
+    myList = []
+
+    for tweet in all_tweets:
+        myList.append(tweet.ru_tweet_text)
+
+    p_list = []
+    for tweet in myList:
+        p = naive_bayes_predict(tweet, logprior, loglikelihood)
+        p_list.append(p)
+
+    df = pd.Series(p_list)
+    ndf = df.to_frame(name='p')
+
+    data = pd.DataFrame()
+
+    data['sentiment'] = p_list
+    fig = plt.figure(figsize=(14, 6))
+    sns.histplot(data['sentiment'], kde=True, color='cadetblue')
+    plt.savefig("./static/russianSentimentPlot.png")
+
+    return render(request, 'russian_sentiment.html', {})
 
 
 def tweet_process(tweet):
     tweet = re.sub(r"http\S+", "", tweet)
     tweet = tweet.replace("@", "")
     tweet = tweet.replace("#", "")
-    return(tweet)
+    return (tweet)
 
 
 def create_frequency(tweets, ys):
@@ -219,6 +306,7 @@ def train_naive_bayes(freqs, train_x, train_y):
 
     return logprior, loglikelihood
 
+
 def naive_bayes_predict(tweet, logprior, loglikelihood):
     '''
     Input:
@@ -242,15 +330,53 @@ def naive_bayes_predict(tweet, logprior, loglikelihood):
     for word in word_l:
 
         # TODO: get log likelihood of each keyword
-        if  word in loglikelihood:
+        if word in loglikelihood:
             p += loglikelihood[word]
 
     return p
 
-from rest_framework import generics
-from .models import Tweet
-from .serializers import TweetSerializer
 
-class TweetList(generics.ListAPIView):
-    queryset = Tweet.objects.all()
+from rest_framework import viewsets, permissions, generics
+from .serializers import TweetSerializer, RuTweetSerializer, RuTweetSentimentSerializer, TweetSentimentSerializer
+
+
+class TweetViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows WesternTweets to be viewed or edited.
+    """
+    http_method_names = ['get', 'post']
+    queryset = WestTweet.objects.all()
     serializer_class = TweetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class TweetSentimentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows WesternTweets to be viewed or edited.
+    """
+    http_method_names = ['get']
+    queryset = WestTweet.objects.all()
+    serializer_class = TweetSentimentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class RuTweetViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows RussianTweets to be viewed or edited.
+    """
+    http_method_names = ['get','post']
+    queryset = RussianTweet.objects.all()
+    serializer_class = RuTweetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+
+class RuTweetSentimentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows RussianTweets to be viewed or edited.
+    """
+    http_method_names = ['get']
+    queryset = RussianTweet.objects.all()
+    serializer_class = RuTweetSentimentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get']
